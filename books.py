@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import Body,FastAPI
 
 BOOKS = [
     {'title': 'Title One', 'author': 'Author One', 'category': 'science'},
@@ -39,3 +39,13 @@ async def read_author_and_category(book_author: str, category: str):
             book.get('category').casefold() == category.casefold():
             books_to_return.append(book)
     return books_to_return
+
+@app.post("/books/create_book")
+async def create_book(new_book=Body()):
+    BOOKS.append(new_book)
+
+@app.put("/books/update_book")
+async def update_book_info(update_book=Body()):
+    for i in range (len(BOOKS)):
+        if BOOKS[i].get('title').casefold() == update_book.get('title').casefold():
+            BOOKS[i] = update_book
