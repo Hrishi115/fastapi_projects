@@ -35,8 +35,7 @@ async def read_category(category: str):
 async def read_author_and_category(book_author: str, category: str):
     books_to_return = []
     for book in BOOKS:
-        if book.get('author').casefold() == book_author.casefold() and \
-            book.get('category').casefold() == category.casefold():
+        if book.get('author').casefold() == book_author.casefold() and book.get('category').casefold() == category.casefold():
             books_to_return.append(book)
     return books_to_return
 
