@@ -1,12 +1,11 @@
 from typing import Annotated
-from fastapi import Depends, Path, HTTPException, APIRouter
-from pydantic import BaseModel, Field
+from fastapi import Depends, HTTPException, APIRouter
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from sqlalchemy.testing.pickleable import User
 from starlette import status
-from models import Todos, Users
-from database import SessionLocal
-from routers import auth
+from ..models import Users
+from ..database import SessionLocal
+from ..routers import auth
 from passlib.context import CryptContext
 
 router = APIRouter(
@@ -44,5 +43,16 @@ async def change_password(user: user_dependency, db: db_dependency, user_verify:
     if not bcrypt_context.verify(user_verify.password, user_model.hashed_password):
         raise HTTPException(status_code=400,detail="Incorrect Password")
     user_model.hashed_password = bcrypt_context.hash(user_verify.new_password)
+    db.add(user_model)
+    db.commit()
+
+@router.put("/add-phone-number/{phone_number}", status_code=status.HTTP_204_NO_CONTENT)
+async def add_phone_number(user: user_dependency, db: db_dependency, phone_number: str):
+    if user is None:
+        raise HTTPException(status_code=400,detail="Authentication Failed")
+    user_model = db.query(Users).filter(Users.id == user.get('id')).first()
+    if not user_model:
+        raise HTTPException(status_code=400,detail="User does not exist")
+    user_model.phone_number = phone_number
     db.add(user_model)
     db.commit()

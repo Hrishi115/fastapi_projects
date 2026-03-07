@@ -5,8 +5,8 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from starlette import status
-from database import SessionLocal
-from models import Users
+from ..database import SessionLocal
+from ..models import Users
 from passlib.context import CryptContext
 from jose import jwt, JWTError
 
@@ -28,6 +28,7 @@ class CreateUserRequest(BaseModel):
     first_name: str
     last_name: str
     role: str
+    phone_number: str
 
 class Token(BaseModel):
     access_token: str
@@ -85,7 +86,8 @@ async def create_user(db:db_dependency, create_user_request: CreateUserRequest):
         first_name=create_user_request.first_name,
         last_name=create_user_request.last_name,
         role=create_user_request.role,
-        is_active=True
+        is_active=True,
+        phone_number=create_user_request.phone_number
     )
 
     db.add(create_user_model)
